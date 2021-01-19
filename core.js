@@ -200,6 +200,8 @@ function showSpread(matrix, x, y) {
         return
     }
 
+    playSound('assets/sounds/Blop-Mark_DiAngelo-79054334.mp3')
+
     forEachInMatrix(matrix, x => x._marked = false)
 
     cell._marked = true
@@ -277,7 +279,7 @@ function isWin(matrix) {
     }
     gameFinished('You win!')
 
-    playSound('assets/woohoo.mp3')
+    playSound('assets/sounds/woohoo.mp3')
 
     return true
 }
@@ -294,7 +296,7 @@ function isLosing() {
 
                 gameFinished('You lose!')
 
-                playSound('assets/haha.mp3')
+                playSound('assets/sounds/haha.mp3')
                 return true
             }
         }
@@ -325,5 +327,14 @@ const countOfMine = select => {
             return 25
         default:
             return 10
+    }
+}
+
+const setRefresh = classes => {
+    const refresh = document.querySelector('.refresh__btn')
+    if (classes) {
+        refresh.classList.add(classes)
+    } else {
+        refresh.classList.remove('active')
     }
 }

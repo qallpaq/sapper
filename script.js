@@ -15,6 +15,7 @@ function init(columns, rows, mines) {
     running = true
 
     setNelson('none')
+    setRefresh()
 
     document
         .querySelector('.finish')
@@ -50,6 +51,10 @@ function update() {
         running = false
     } else if (isWin(matrix)) {
         running = false
+    }
+
+    if (!running) {
+        setRefresh('active')
     }
 }
 
@@ -125,12 +130,14 @@ function leftHandler(cell) {
     }
     cell.show = true
 
-    if (cell.show) {
-        playSound('assets/button-click-sound-effect.mp3')
-    }
+    if (running) {
+        if (cell.show) {
+            playSound('assets/sounds/button-click-sound-effect.mp3')
+        }
 
-    if (cell.mine) {
-        playSound('assets/Explosion+1.mp3')
+        if (cell.mine) {
+            playSound('assets/sounds/Explosion+1.mp3')
+        }
     }
     showSpread(matrix, cell.x, cell.y)
 }

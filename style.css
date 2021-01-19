@@ -55,6 +55,22 @@ html, body {
 
 .refresh__btn {
     color: #ffffff;
+    width: 100px;
+}
+
+.refresh__btn.active{
+    animation: refresh-active .5s linear infinite alternate;
+}
+
+@keyframes refresh-active {
+    0% {
+        color: #ffffff;
+        font-size: 20px;
+    }
+    100% {
+        color: #f68383;
+        font-size: 25px;
+    }
 }
 
 .refresh:hover .refresh__btn{
