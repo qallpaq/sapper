@@ -3,14 +3,14 @@ let running = null
 
 const select = document.querySelector('.select')
 
-init(11, 11, countOfMine(select))
-
 document
-    .querySelector('.settings__btn')
-    .addEventListener('click', () => init(11, 11, countOfMine(select)))
+    .querySelector('.refresh')
+    .addEventListener('click', () => init(15, 15, countOfMine(select)))
+
+init(15, 15, countOfMine(select))
+
 
 function init(columns, rows, mines) {
-
     matrix = getMatrix(columns, rows)
     running = true
 
@@ -120,12 +120,18 @@ function getInfo(event) {
 }
 
 function leftHandler(cell) {
-
     if (cell.show || cell.flag) {
         return
     }
     cell.show = true
 
+    if (cell.show) {
+        playSound('assets/button-click-sound-effect.mp3')
+    }
+
+    if (cell.mine) {
+        playSound('assets/Explosion+1.mp3')
+    }
     showSpread(matrix, cell.x, cell.y)
 }
 

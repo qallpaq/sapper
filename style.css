@@ -39,33 +39,54 @@ html, body {
 }
 
 .settings {
-    margin-bottom: 10px;
     display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background: #5a8e19;
+    padding: 10px;
 }
 
-.level, .settings__btn {
-    text-transform: uppercase;
-    border-radius: 3px;
-    background: bisque;
-    font-size: 16px;
+.refresh {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.refresh__btn {
+    color: #ffffff;
+}
+
+.refresh:hover .refresh__btn{
+    transition: .2s;
+    color: #f6d1d1;
+}
+
+.refresh__img {
+    width: 40px;
+    height: 40px;
+}
+
+.level, .refresh__btn {
+    background: transparent;
+    font-size: 20px;
     padding: 5px 10px;
-    border: 2px solid #fdd698;
+}
+
+.level {
+    background: #ffffff;
+    border-radius: 3px;
 }
 
 .level option {
     cursor: pointer;
-    text-transform: uppercase;
+    font-size: 20px;
 }
 
 .select {
-    font-size: 15px;
-    text-transform: uppercase;
+    font-size: 20px;
     cursor: pointer;
     background: transparent;
-}
-
-.settings__btn:active {
-    background: #e8b984;
 }
 
 .sapper {

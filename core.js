@@ -132,10 +132,22 @@ function matrixToHtml(matrix) {
             wrapper.append(imgElement)
 
             const wrapperBackground = color => wrapper.style.background = color
+            const wrapperBorder = border => wrapper.style[border] = '2px solid green'
 
-            const paintCells = ({id}, first = '#bbad40', second = '#87922b') => id % 2 === 0
+            const paintCells = ({id}, first = '#95d039', second = '#9ddc39') => id % 2 === 0
                 ? wrapperBackground(first)
                 : wrapperBackground(second)
+
+            const isBorder = (matrix, x, y) => {
+                if (!cell.show && getCell(matrix, x, y).show) {
+                    return true
+                }
+            }
+
+            if (isBorder(matrix, x + 1, y)) wrapperBorder('borderRight')
+            if (isBorder(matrix, x - 1, y)) wrapperBorder('borderLeft')
+            if (isBorder(matrix, x, y - 1)) wrapperBorder('borderTop')
+            if (isBorder(matrix, x, y + 1)) wrapperBorder('borderBottom')
 
             if (cell.flag) {
                 paintCells(cell)
@@ -144,7 +156,7 @@ function matrixToHtml(matrix) {
             }
 
             if (cell.potentialMine) {
-                paintCells(cell, '#998e34', '#656d20')
+                paintCells(cell, '#ade066', '#bfff72')
                 continue
             }
 
@@ -154,20 +166,19 @@ function matrixToHtml(matrix) {
             }
 
             if (cell.mine) {
-                wrapperBackground('#9a4f1c')
+                paintCells(cell, '#e3be5d', '#deb749')
                 imgElement.src = 'assets/mine.png'
                 continue
             }
 
             if (cell.number) {
-                wrapperBackground('#9a4f1c')
+                paintCells(cell, '#e3be5d', '#deb749')
                 wrapper.innerText = cell.number
                 wrapper.style.color = setColor(cell.number)
                 continue
             }
-
+            paintCells(cell, '#e3be5d', '#deb749')
             wrapper.innerText = ''
-            wrapperBackground('#9a4f1c')
         }
 
         gameElement.append(rowElement)
@@ -309,10 +320,10 @@ const playSound = path => new Audio(path).play()
 const countOfMine = select => {
     switch (parseInt(select.value)) {
         case 2:
-            return 10
+            return 15
         case 3:
-            return 20
+            return 25
         default:
-            return 5
+            return 10
     }
 }
