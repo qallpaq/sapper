@@ -29,15 +29,11 @@ function getMatrix(columns, rows) {
 function getRandomFreeCell(matrix) {
     const freeCells = []
 
-    for (let y = 0; y < matrix.length; y++) {
-        for (let x = 0; x < matrix[y].length; x++) {
-            const cell = matrix[y][x]
-
-            if (!cell.mine) {
-                freeCells.push(cell)
-            }
-        }
-    }
+    matrix.forEach(row => {
+        row.forEach(cell => {
+            !cell.mine && freeCells.push(cell)
+        })
+    })
 
     const index = Math.floor(Math.random() * freeCells.length)
     return freeCells[index]
@@ -114,40 +110,44 @@ const setColor = num => {
 function matrixToHtml(matrix) {
     const gameElement = createElementWithClass('div', 'sapper')
 
+    const createCell = (tag, classNames, cell) => {
+        const element = createElementWithClass(tag, classNames)
+        element.draggable = false
+        element.oncontextmenu = () => false
+        element.setAttribute('data-cell-id', cell.id)
+        return element
+    }
+
+    const setBackground = (color, wrapper) => wrapper.style.background = color
+
+    const setBorder = (border, wrapper) => wrapper.style[border] = '2px solid green'
+
+    const isBorder = (matrix, x, y, cell) => {
+        if (!cell.show && getCell(matrix, x, y).show) {
+            return true
+        }
+    }
+
     for (let y = 0; y < matrix.length; y++) {
         const rowElement = createElementWithClass('div', 'row')
 
         for (let x = 0; x < matrix[y].length; x++) {
             const cell = matrix[y][x]
 
-            const wrapper = createElementWithClass('div', 'wrapper')
-            wrapper.draggable = false
-            wrapper.oncontextmenu = () => false
-            wrapper.setAttribute('data-cell-id', cell.id)
+            const wrapper = createCell('div', 'wrapper', cell)
             rowElement.append(wrapper)
 
-            const imgElement = createElementWithClass('img', 'cell-img')
-            imgElement.setAttribute('data-cell-id', cell.id)
-            imgElement.oncontextmenu = () => false
+            const imgElement = createCell('img', 'cell-img', cell)
             wrapper.append(imgElement)
 
-            const wrapperBackground = color => wrapper.style.background = color
-            const wrapperBorder = border => wrapper.style[border] = '2px solid green'
-
             const paintCells = ({id}, first = '#95d039', second = '#9ddc39') => id % 2 === 0
-                ? wrapperBackground(first)
-                : wrapperBackground(second)
+                ? setBackground(first, wrapper)
+                : setBackground(second, wrapper)
 
-            const isBorder = (matrix, x, y) => {
-                if (!cell.show && getCell(matrix, x, y).show) {
-                    return true
-                }
-            }
-
-            if (isBorder(matrix, x + 1, y)) wrapperBorder('borderRight')
-            if (isBorder(matrix, x - 1, y)) wrapperBorder('borderLeft')
-            if (isBorder(matrix, x, y - 1)) wrapperBorder('borderTop')
-            if (isBorder(matrix, x, y + 1)) wrapperBorder('borderBottom')
+            if (isBorder(matrix, x + 1, y, cell)) setBorder('borderRight', wrapper)
+            if (isBorder(matrix, x - 1, y, cell)) setBorder('borderLeft', wrapper)
+            if (isBorder(matrix, x, y - 1, cell)) setBorder('borderTop', wrapper)
+            if (isBorder(matrix, x, y + 1, cell)) setBorder('borderBottom', wrapper)
 
             if (cell.flag) {
                 paintCells(cell)
@@ -166,18 +166,18 @@ function matrixToHtml(matrix) {
             }
 
             if (cell.mine) {
-                paintCells(cell, '#e3be5d', '#deb749')
+                paintCells(cell, '#deb749', '#e3be5d')
                 imgElement.src = 'assets/mine.png'
                 continue
             }
 
             if (cell.number) {
-                paintCells(cell, '#e3be5d', '#deb749')
+                paintCells(cell, '#deb749', '#e3be5d')
                 wrapper.innerText = cell.number
                 wrapper.style.color = setColor(cell.number)
                 continue
             }
-            paintCells(cell, '#e3be5d', '#deb749')
+            paintCells(cell, '#deb749', '#e3be5d')
             wrapper.innerText = ''
         }
 
@@ -200,7 +200,7 @@ function showSpread(matrix, x, y) {
         return
     }
 
-    playSound('assets/sounds/Blop-Mark_DiAngelo-79054334.mp3')
+    playSound('assets/sounds/Blop-Mark_DiAngelo-79054334.mp3').catch(e => console.log(e))
 
     forEachInMatrix(matrix, x => x._marked = false)
 
@@ -248,13 +248,8 @@ function isWin(matrix) {
     const mines = []
 
     forEachInMatrix(matrix, cell => {
-        if (cell.flag) {
-            flags.push(cell)
-        }
-
-        if (cell.mine) {
-            mines.push(cell)
-        }
+        if (cell.flag) flags.push(cell)
+        if (cell.mine) mines.push(cell)
     })
 
     if (flags.length !== mines.length) {
@@ -279,7 +274,7 @@ function isWin(matrix) {
     }
     gameFinished('You win!')
 
-    playSound('assets/sounds/woohoo.mp3')
+    playSound('assets/sounds/woohoo.mp3').catch(e => console.log(e))
 
     return true
 }
@@ -289,14 +284,11 @@ function isLosing() {
         for (let x = 0; x < matrix[y].length; x++) {
             const cell = matrix[y][x]
 
-
             if (cell.mine && cell.show) {
-
                 setNelson('block')
-
                 gameFinished('You lose!')
-
-                playSound('assets/sounds/haha.mp3')
+                playSound('assets/sounds/Explosion+1.mp3').catch(e => console.log(e))
+                playSound('assets/sounds/haha.mp3').catch(e => console.log(e))
                 return true
             }
         }
@@ -322,11 +314,11 @@ const playSound = path => new Audio(path).play()
 const countOfMine = select => {
     switch (parseInt(select.value)) {
         case 2:
-            return 15
+            return 20
         case 3:
-            return 25
+            return 30
         default:
-            return 10
+            return 15
     }
 }
 

@@ -2,10 +2,17 @@ let matrix = null
 let running = null
 
 const select = document.querySelector('.select')
+const app = document.querySelector('#app')
+const modal = document.querySelector('.modal')
+const refresh = document.querySelector('.refresh')
 
-document
-    .querySelector('.refresh')
-    .addEventListener('click', () => init(15, 15, countOfMine(select)))
+app.addEventListener('click', () => {
+    if (modal) modal.style.display = 'none'
+})
+
+refresh.addEventListener('click', () => {
+    init(15, 15, countOfMine(select))
+})
 
 init(15, 15, countOfMine(select))
 
@@ -29,9 +36,7 @@ function init(columns, rows, mines) {
 }
 
 function update() {
-    if (!running) {
-        return
-    }
+    if (!running) return
 
     const gameElement = matrixToHtml(matrix)
     const appElement = document.querySelector('.sapper-wrapper')
@@ -47,13 +52,8 @@ function update() {
             wrapper.addEventListener('mouseleave', mouseleaveHandler)
         })
 
-    if (isLosing(matrix)) {
+    if (isLosing(matrix) || isWin(matrix)) {
         running = false
-    } else if (isWin(matrix)) {
-        running = false
-    }
-
-    if (!running) {
         setRefresh('active')
     }
 }
@@ -61,17 +61,9 @@ function update() {
 function mousedownHandler(event) {
     const {cell, left, right} = getInfo(event)
 
-    if (left) {
-        cell.left = true
-    }
-
-    if (right) {
-        cell.right = true
-    }
-
-    if (cell.left && cell.right) {
-        bothHandler(cell)
-    }
+    if (left) cell.left = true
+    if (right) cell.right = true
+    if (cell.left && cell.right) bothHandler(cell)
 
     update()
 }
@@ -83,17 +75,9 @@ function mouseupHandler(event) {
     const leftMouse = !both && cell.left && left
     const rightMouse = !both && cell.right && right
 
-    if (both) {
-        forEachInMatrix(matrix, x => x.potentialMine = false)
-    }
-
-    if (left) {
-        cell.left = false
-    }
-
-    if (right) {
-        cell.right = false
-    }
+    if (both) forEachInMatrix(matrix, x => x.potentialMine = false)
+    if (left) cell.left = false
+    if (right) cell.right = false
 
     if (leftMouse) {
         leftHandler(cell)
@@ -125,33 +109,22 @@ function getInfo(event) {
 }
 
 function leftHandler(cell) {
-    if (cell.show || cell.flag) {
-        return
-    }
+    if (cell.show || cell.flag) return
+
     cell.show = true
 
     if (running) {
-        if (cell.show) {
-            playSound('assets/sounds/button-click-sound-effect.mp3')
-        }
-
-        if (cell.mine) {
-            playSound('assets/sounds/Explosion+1.mp3')
-        }
+        playSound('assets/sounds/button-click-sound-effect.mp3').catch(e => console.log(e))
     }
+
     showSpread(matrix, cell.x, cell.y)
 }
 
-function rightHandler(cell) {
-    if (!cell.show) {
-        cell.flag = !cell.flag
-    }
-}
+const rightHandler = cell => !cell.show ?
+    cell.flag = !cell.flag : null
 
 function bothHandler(cell) {
-    if (!cell.show || !cell.number) {
-        return
-    }
+    if (!cell.show || !cell.number) return
 
     const cells = getAroundCells(matrix, cell.x, cell.y)
     const flags = cells.filter(x => x.flag).length
